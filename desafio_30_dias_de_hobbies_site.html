@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Desafio 30 Dias de Hobbies</title>
+  <style>
+    :root{
+      --bg:#0f1724; /* deep navy */
+      --card:#0b1220;
+      --muted:#9aa7bf;
+      --accent:#2b8af6; /* blue */
+      --accent-2:#6ea8ff;
+      --glass: rgba(255,255,255,0.04);
+      --success:#28c76f;
+      --radius:14px;
+      --blur:8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071020 0%, #0b1530 100%);color:#e6eef8}
+    a{color:inherit}
+    .app{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo .mark{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 8px 30px rgba(43,138,246,0.12)}
+    h1{font-size:20px;margin:0}
+    .sub{color:var(--muted);font-size:13px}
+
+    /* card */
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);backdrop-filter:blur(var(--blur));box-shadow:0 6px 30px rgba(2,6,23,0.6);}
+
+    /* home */
+    .home-hero{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:18px}
+    .hero-text h2{font-size:28px;margin:0 0 8px}
+    .hero-text p{color:var(--muted);line-height:1.5}
+    .btn{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:white;padding:12px 16px;border-radius:999px;border:0;cursor:pointer;font-weight:600;box-shadow:0 8px 24px rgba(43,138,246,0.18);transition:transform .18s ease,box-shadow .18s}
+    .btn:active{transform:translateY(1px)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent-2);box-shadow:none}
+
+    .countdown{font-weight:700;font-size:14px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:10px;border-radius:12px;text-align:center}
+
+    /* selection */
+    .grid-60{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+    .hobby-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform .12s,box-shadow .12s}
+    .hobby-item:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    .hobby-item input{width:18px;height:18px}
+    .hobby-name{font-weight:600}
+    .muted{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:12px;align-items:center;margin-top:12px}
+
+    /* dashboard */
+    .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
+    .hobby-card{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));}
+    .pill{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);align-items:center;gap:8px}
+
+    .progress-wrap{display:flex;align-items:center;gap:12px;margin-top:10px}
+    .progbar{flex:1;height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+    .progbar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .6s cubic-bezier(.2,.9,.2,1)}
+
+    /* hobby detail */
+    .suggestions{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .suggestions li{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px}
+
+    footer{margin-top:30px;color:var(--muted);font-size:13px;text-align:center}
+
+    /* small screens */
+    @media (max-width:880px){.home-hero{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <div class="mark">💡</div>
+        <div>
+          <h1>Desafio 30 Dias de Hobbies</h1>
+          <div class="sub">Minimal · Tecnológico · Motivacional 🚀</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div id="countdownTop" class="countdown card">Não iniciado ⏳</div>
+        <button class="btn ghost" id="goHome">Início</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- HOME -->
+      <section id="view-home" class="card" style="margin-top:18px">
+        <div class="home-hero">
+          <div class="hero-text">
+            <h2>Você tem 30 dias para realizar 5 hobbies de uma lista com 60 opções. ✨👩‍💻</h2>
+            <p>Escolha 5 hobbies, dedique tempo a aprender e completar desafios práticos. O site salva seu progresso localmente para você continuar sempre que quiser. Comece agora e transforme 30 dias em crescimento pessoal! 💫</p>
+            <div style="margin-top:16px">
+              <button class="btn" id="startBtn">Iniciar Desafio 🚀</button>
+              <button class="btn ghost" id="seeHobbies">Ver lista de hobbies</button>
+            </div>
+            <div style="margin-top:12px;color:var(--muted)">Dica: clique em Iniciar e selecione 5 hobbies que você realmente quer experimentar. 😉</div>
+          </div>
+
+          <div class="card" style="padding:18px;border-radius:16px;height:100%">
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+              <div style="font-size:13px;color:var(--muted)">Progresso do desafio</div>
+              <div class="pill">📅 <strong id="daysLeft">—</strong> dias restantes</div>
+              <div style="width:100%;margin-top:12px">
+                <div style="color:var(--muted);font-size:13px">Status</div>
+                <div class="progress-wrap">
+                  <div class="progbar" style="width:100%"><i id="progBarInner"></i></div>
+                  <div id="progText" style="min-width:70px;text-align:right;font-weight:700">0/5</div>
+                </div>
+                <div style="color:var(--muted);font-size:12px;margin-top:8px">Comece quando clicar em "Iniciar Desafio" — o tempo começa a contar imediatamente. ⏱️</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SELECTION -->
+      <section id="view-selection" class="card" style="display:none;margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h2>Escolha 5 hobbies 🧭</h2>
+            <div class="muted">Marque até 5 opções. Você pode alterar até confirmar.</div>
+          </div>
+          <div class="controls">
+            <button class="btn ghost" id="backToHome">Voltar</button>
+            <button class="btn" id="confirmSelection">Confirmar seleção ✅</button>
+          </div>
+        </div>
+        <div class="grid-60" id="hobbyGrid"></div>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="view-dashboard" class="card" style="display:none;margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h2>Seu Dashboard 🎯</h2>
+            <div class="muted">Aqui estão os 5 hobbies do seu desafio.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="pill">📆 <span id="dashDaysLeft">—</span> dias</div>
+            <button class="btn ghost" id="resetBtn">Reiniciar desafio</button>
+          </div>
+        </div>
+
+        <div class="dash-grid" id="selectedHobbies"></div>
+      </section>
+
+      <!-- HOBBY DETAIL -->
+      <section id="view-hobby" class="card" style="display:none;margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h2 id="hobbyTitle">Hobby</h2>
+            <div class="muted" id="hobbySubtitle">Sugestões e plano</div>
+          </div>
+          <div class="controls">
+            <button class="btn ghost" id="backToDash">Voltar ao dashboard</button>
+            <button class="btn" id="completeHobby">Concluído ✅</button>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <h3>Sugestões de aprendizado 💡</h3>
+          <ul class="suggestions" id="suggestionsList"></ul>
+        </div>
+      </section>
+
+      <!-- RESULT -->
+      <section id="view-result" class="card" style="display:none;margin-top:18px;text-align:center">
+        <div id="resultContent"></div>
+        <div style="margin-top:16px">
+          <button class="btn" id="shareBtn">Compartilhar resultado 🎉</button>
+          <button class="btn ghost" id="goHomeFromResult">Ir para Início</button>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      Feito com 💙 por você — Desafio 30 Dias • Salvamento local (localStorage) • Visual motivacional 🤖
+    </footer>
+  </div>
+
+<script>
+// ----- Dados: 60 hobbies com 5 sugestões cada -----
+const HOBBIES = [
+  {name:'Desenho', picks:[
+    'Assista a tutoriais de desenho básico (proporção, sombra, perspectiva).',
+    'Pratique um esboço por dia — 10 minutos cada.','Experimente materiais diferentes: carvão, lápis, digital.','Copie estudos de artistas que você admira para entender técnica.','Crie uma pequena série de 3 ilustrações com um tema.']},
+  {name:'Pintura', picks:['Aprenda mistura de cores e teoria básica.','Tente aquarela, acrílica e óleo (mini-experimentos).','Faça um estudo de cor com 3 paletas diferentes.','Pinte um quadro pequeno 3 vezes com variações.','Participe de um desafio de pintura online.']},
+  {name:'Fotografia', picks:['Estude composição (regra dos terços, linhas).','Pratique em um tema diário: sombras, retratos, paisagens.','Aprenda edição básica (contraste, cor) em app.','Experimente fotografia com celular e lente manual.','Crie um portfólio com 10 fotos e peça feedback.']},
+  {name:'Culinária', picks:['Aprenda 5 receitas básicas (massa, arroz, proteína).','Pratique técnicas: refogar, assar, grelhar.','Experimente uma cozinha internacional por semana.','Faça uma refeição completa e fotografe o resultado.','Convide alguém para provar e peça opinião.']},
+  {name:'Jardinagem', picks:['Plante ervas em vasos (manjericão, hortelã).','Aprenda sobre rega e tipos de solo.','Faça uma composteira pequena.','Tente propagação por estacas.','Monitore crescimento e registre fotos semanais.']},
+  {name:'Meditação', picks:['Comece com 5–10 minutos diários.','Experimente meditação guiada e silêncio.','Use técnicas de respiração 4-4-4.','Registre sensações antes/depois por uma semana.','Aprenda um exercício de atenção plena.']},
+  {name:'Yoga', picks:['Pratique uma sequência de 20 minutos por dia.','Aprenda saudações ao sol e postura básica.','Assista a aulas para alinhamento.','Trabalhe flexibilidade com alongamentos diários.','Combine respiração com movimento.']},
+  {name:'Escultura', picks:['Experimente argila de modelagem para iniciantes.','Faça estudos de formas simples.','Aprenda técnicas de texturização.','Modele uma peça pequena e finalize.','Fotografe o processo para um diário criativo.']},
+  {name:'Costura', picks:['Aprenda pontos básicos à mão e na máquina.','Faça um projeto pequeno: almofada ou máscara.','Estude tipos de tecido e agulhas.','Repasse uma peça velha com ajuste.','Assista a tutoriais e repita o passo a passo.']},
+  {name:'Tricô', picks:['Aprenda pontos base: meia e liga.','Faça uma amostra de 10x10cm.','Crie um projeto simples: cachecol.','Experimente diferentes fios e agulhas.','Participe de um grupo local ou online.']},
+  {name:'Origami', picks:['Aprenda 5 dobras fundamentais.','Faça 3 figuras para decorar um quadro.','Estude diagramas e símbolos.','Combine dobraduras em uma cena.','Crie cartões com origami anexado.']},
+  {name:'Astronomia', picks:['Aprenda constelações visíveis na sua cidade.','Use um app para identificar planetas.','Observe a lua por uma semana e registre fases.','Leia sobre telescópios e escolha um tipo.','Faça uma lista de eventos astronômicos do mês.']},
+  {name:'Programação', picks:['Faça um projeto simples (ex: to-do em JS).','Estude lógica e estruturas básicas.','Use exercícios diários (katas).','Leia código de projetos open-source.','Publique seu projeto no GitHub.']},
+  {name:'Web Design', picks:['Aprenda HTML/CSS básicos.','Crie uma página pessoal simples.','Estude princípios de UX e tipografia.','Crie 3 variações de layout para a mesma página.','Peça feedback e ajuste.']},
+  {name:'Blogging', picks:['Escreva 5 posts curtos sobre um tema.','Aprenda técnicas de título e abertura.','Pratique revisão e edição.','Publique um post e compartilhe.','Organize ideias em um calendário de conteúdo.']},
+  {name:'Podcasting', picks:['Escreva roteiro para 1 episódio.','Grave um episódio curto (10–15 min).','Aprenda edição básica de áudio.','Escolha identidade sonora e capa.','Publique um episódio piloto para amigos.']},
+  {name:'Instrumento – Violão', picks:['Aprenda acordes abertos básicos.','Pratique mudanças de acorde 10 min/dia.','Aprenda 2 músicas simples.','Estude dedilhado básico.','Toque com um metrônomo para ritmo.']},
+  {name:'Instrumento – Teclado', picks:['Aprenda escalas e acordes básicos.','Toque progressões simples.','Pratique coordenação mãos separadas.','Aprenda 2 músicas fáceis.','Use apps para teoria musical.']},
+  {name:'Canto', picks:['Aqueça a voz com exercícios diários.','Pratique respiração diafragmática.','Cante alongando notas por 30s.','Grave sua voz e escute para ajustar.','Aprenda uma canção e cante com acompanhamento.']},
+  {name:'Dança', picks:['Aprenda passos básicos de um estilo.','Pratique coreografia curta.','Use vídeos para corrigir postura.','Grave e observe seu movimento.','Participe de uma aula online.']},
+  {name:'Budgeting', picks:['Crie um orçamento simples para o mês.','Registre despesas por 7 dias.','Identifique 3 despesas que cortar.','Estabeleça metas de economia.','Revise resultados no final do mês.']},
+  {name:'Investimentos (básico)', picks:['Aprenda conceitos: risco, liquidez, rentabilidade.','Estude tipos de investimento (renda fixa/variável).','Abra conta demo ou com pouco valor.','Monte mini-portfolio com metas.','Acompanhe desempenho por 30 dias.']},
+  {name:'Idioma – Inglês', picks:['Aprenda 20 palavras novas por semana.','Pratique listening com vídeos curtos.','Faça uma conversa de 10 minutos.','Leia um artigo curto e resuma.','Use flashcards para revisão.']},
+  {name:'Idioma – Espanhol', picks:['Aprenda frases úteis do cotidiano.','Pratique com apps de conversação.','Assista a um vídeo em espanhol e anote palavras.','Faça diálogos simples.','Leia notícias curtas em espanhol.']},
+  {name:'Caligrafia', picks:['Pratique traços básicos e curvas.','Faça exercícios de espaçamento.','Teste diferentes canetas.','Crie uma frase com letra decorativa.','Monte pequenos cartões escritos à mão.']},
+  {name:'Calligrafia digital', picks:['Use tablet ou app e aprenda pincéis.','Pratique letras maiúsculas e minúsculas.','Crie um cartão digital.','Experimente efeitos de sombra.','Partilhe em redes para feedback.']},
+  {name:'Hiking', picks:['Planeje uma trilha curta local.','Cheque equipamentos básicos.','Pratique caminhada 2x por semana.','Leve um diário e registre a experiência.','Fotografe paisagens favoritas.']},
+  {name:'Corrida', picks:['Inicie com corrida leve 3x/semana.','Use método intervalado para evolução.','Acompanhe distância e tempo.','Faça alongamento pré/pós.','Estabeleça meta de 5km.']},
+  {name:'Ciclismo', picks:['Faça passeios curtos e aumente distância.','Verifique manutenção básica da bike.','Aprenda postura e cadência.','Experimente rotas diferentes.','Participe de um pedal em grupo.']},
+  {name:'Marketching', picks:['Estude básico de pesquisa de mercado.','Faça uma mini-entrevista com 5 pessoas.','Analise concorrentes simples.','Crie um mapa de empatia.','Apresente descobertas para alguém.']},
+  {name:'Design Gráfico', picks:['Aprenda ferramentas básicas (Figma/Canva).','Crie 3 variações de um cartaz.','Estude teoria das cores.','Refaça um design famoso com sua versão.','Peça feedback e itere.']},
+  {name:'UI/UX', picks:['Aprenda princípios de usabilidade.','Crie wireframe de uma tela.','Faça teste de usabilidade com um amigo.','Estude heurísticas de Nielsen.','Melhore um design existente.']},
+  {name:'Videomaking', picks:['Planeje um roteiro curto.','Grave cenas simples com celular.','Aprenda cortes básicos na edição.','Adicione trilha sonora livre de direitos.','Publique um vídeo curto.']},
+  {name:'Edição de Vídeo', picks:['Aprenda um editor básico.','Corte e monte um episódio curto.','Experimente transições e correção de cor.','Adicione títulos e legendas.','Exporte em diferentes formatos.']},
+  {name:'Animação', picks:['Faça flipbook simples para entender timing.','Use software básico para animação 2D.','Crie uma cena de 5 segundos.','Estude princípios de animação (squash, stretch).','Compartilhe para feedback.']},
+  {name:'Jornalismo', picks:['Escreva uma matéria curta.','Aprenda checagem de fontes.','Faça uma entrevista simples.','Edite o texto com foco em clareza.','Publique em blog ou rede.']},
+  {name:'Astral projection (curiosidade)', picks:['Leia materiais confiáveis sobre o tema.','Mantenha diário de sonhos.','Pratique relaxamento profundo.','Aprenda técnicas de visualização.','Registre qualquer experiência e analise.']},
+  {name:'DIY (faça você mesmo)', picks:['Escolha um projeto pequeno de madeira ou papel.','Planeje materiais e passos.','Monte e fotografe o processo.','Aprenda acabamento limpo.','Repita com variação de design.']},
+  {name:'Restauro de móveis', picks:['Comece com peça pequena a restaurar.','Aprenda técnicas de lixamento e pintura.','Use produtos testados para acabamento.','Pratique remoção de ferrugem e verniz.','Documente antes e depois.']},
+  {name:'Modelismo', picks:['Escolha um kit simples e monte com cuidado.','Pinte e aplique detalhes.','Use cola e ferramentas corretas.','Aprenda técnicas de weathering.','Exponha o modelo e fotografe.']},
+  {name:'Making (eletrônica básica)', picks:['Aprenda solda segura em placa de teste.','Monte um circuito simples (LED).','Use um microcontrolador básico.','Leia esquemas e componentes.','Crie um projeto funcional pequeno.']},
+  {name:'Robótica', picks:['Aprenda lógica de sensores e atuadores.','Monte um robô simples com kit.','Programe comportamentos básicos.','Teste em pistas pequenas.','Itere o projeto com melhorias.']},
+  {name:'Cerâmica', picks:['Faça pequenas peças em argila.','Aprenda técnicas de acabamento.','Experimente esmaltes e queima (se possível).','Molde com ferramentas simples.','Crie um conjunto de 3 peças.']},
+  {name:'Barista (café)', picks:['Aprenda tipos de extração (filtro, espresso).','Treine moagem e proporção.','Faça latte art básico.','Experimente blends e origem.','Documente receitas favoritas.']},
+  {name:'Mixologia', picks:['Aprenda receitas básicas de coquetéis.','Estude equilíbrio entre doce/ácido/amargo.','Pratique apresentação e guarnições.','Crie uma receita original.','Registre variações e notas.']},
+  {name:'Herbalismo', picks:['Estude ervas comuns e usos.','Faça infusões simples.','Aprenda sobre segurança e dosagens.','Plante uma erva e monitore.','Crie uma rotina de chás para bem-estar.']},
+  {name:'Fotografia Analógica', picks:['Aprenda tipos de filme e câmeras.','Faça rolos e revele (se possível).','Pratique composição sem ver o preview.','Digitalize negativos e edite.','Crie uma série temática.']},
+  {name:'Produção Musical', picks:['Aprenda um DAW básico.','Crie um loop e construa uma base.','Estude mixagem básica.','Colabore com um músico.','Exporte uma faixa curta.']},
+  {name:'DJing', picks:['Aprenda a mixar duas faixas.','Entenda batida e BPM.','Pratique transições suaves.','Crie uma playlist temática.','Grave um set curto.']},
+  {name:'Board games (design)', picks:['Jogue 3 jogos para estudar mecânica.','Crie um protótipo simples.','Teste com amigos e anote feedback.','Ajuste regras e balanceamento.','Finalize protótipo e jogue novamente.']},
+  {name:'Calistenia', picks:['Aprenda movimentos básicos de peso corporal.','Pratique rotina de força 3x/semana.','Monitore repetições e progressão.','Aprenda técnica para evitar lesões.','Combine com trabalho de mobilidade.']},
+  {name:'Marcenaria', picks:['Faça um projeto pequeno (prateleira).','Aprenda medidas e cortes.','Pratique acabamento e lixas.','Use ferramentas básicas com segurança.','Documente o passo a passo.']},
+  {name:'Aquarela urbana (plein air)', picks:['Saia para pintar uma cena curta.','Estude cores naturais e luz.','Faça estudos rápidos (30 min).','Use papel apropriado.','Monte um pequeno sketchbook de rua.']},
+  {name:'Leitura crítica', picks:['Leia 5 textos curtos de gêneros variados.','Resuma cada texto em 3 frases.','Identifique argumento e evidência em cada.','Discuta com alguém ou escreva uma resenha.','Crie perguntas críticas sobre cada leitura.']},
+  {name:'Automaquiagem', picks:['Aprenda uma rotina básica de pele.','Treine um look natural e um mais elaborado.','Aprenda contorno e iluminação.','Pratique aplicação simétrica.','Faça fotos para ver resultados.']}
+];
+
+// ----- Estado local -----
+const STORAGE_KEY = 'desafio30_hobbies_v1';
+let state = { selected: [], completed: [], startedAt: null };
+
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function loadState(){ const s = localStorage.getItem(STORAGE_KEY); if(s){ try{ state = JSON.parse(s); }catch(e){} } updateUI(); }
+
+// ----- Routers/views -----
+const views = {
+  home: document.getElementById('view-home'),
+  selection: document.getElementById('view-selection'),
+  dashboard: document.getElementById('view-dashboard'),
+  hobby: document.getElementById('view-hobby'),
+  result: document.getElementById('view-result')
+};
+
+function showView(name){ Object.values(views).forEach(v=>v.style.display='none'); views[name].style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
+
+// ----- Countdown -----
+function getDaysLeft(){ if(!state.startedAt) return null; const start = new Date(state.startedAt); const end = new Date(start.getTime() + 30*24*60*60*1000); const now = new Date(); const diff = end - now; if(diff<=0) return 0; return Math.ceil(diff/(24*60*60*1000)); }
+
+function updateCountdown(){ const top = document.getElementById('countdownTop'); const daysLeft = getDaysLeft(); if(state.startedAt){ if(daysLeft<=0){ top.textContent = '0 dias — Desafio finalizado ⏳'; } else { top.textContent = daysLeft + ' dias restantes ⏱️'; } } else { top.textContent = 'Não iniciado ⏳'; }
+  // small card
+  const daysEl = document.getElementById('daysLeft'); daysEl.textContent = daysLeft===null? '—' : daysLeft;
+  const dashDays = document.getElementById('dashDaysLeft'); dashDays.textContent = daysLeft===null? '—' : daysLeft;
+}
+
+// prog
+function updateProgress(){ const count = state.completed.length; const inner = document.getElementById('progBarInner'); const text = document.getElementById('progText'); const pct = Math.round((count/5)*100); inner.style.width = pct + '%'; text.textContent = count + '/5'; }
+
+// ----- Build selection grid -----
+function buildGrid(){ const grid = document.getElementById('hobbyGrid'); grid.innerHTML=''; HOBBIES.forEach((h,i)=>{
+  const el = document.createElement('label'); el.className='hobby-item'; el.dataset.idx=i;
+  const checkbox = document.createElement('input'); checkbox.type='checkbox'; checkbox.dataset.idx=i;
+  const div = document.createElement('div'); div.style.display='flex'; div.style.flexDirection='column';
+  const name = document.createElement('div'); name.className='hobby-name'; name.textContent = h.name + ' 🔧';
+  const small = document.createElement('div'); small.className='muted'; small.style.fontSize='12px'; small.textContent = h.picks[0];
+  div.appendChild(name); div.appendChild(small);
+  el.appendChild(checkbox); el.appendChild(div);
+  checkbox.addEventListener('change', onCheck);
+  el.addEventListener('click', function(e){ if(e.target.tagName !== 'INPUT') checkbox.checked = !checkbox.checked; checkbox.dispatchEvent(new Event('change')); });
+  grid.appendChild(el);
+}); updateSelectionChecks(); }
+
+function onCheck(e){ const idx = Number(e.target.dataset.idx); const checked = e.target.checked; if(checked){ if(state.selected.length>=5){ // prevent
+    e.target.checked=false; shake(e.target.closest('.hobby-item')); flashNotice('Você só pode escolher 5 hobbies.'); return; }
+    if(!state.selected.includes(idx)) state.selected.push(idx);
+  } else { state.selected = state.selected.filter(x=>x!==idx); }
+  saveState(); updateSelectionChecks(); }
+
+function updateSelectionChecks(){ document.querySelectorAll('#hobbyGrid input').forEach(inp=>{ const i = Number(inp.dataset.idx); inp.checked = state.selected.includes(i); }); }
+
+function shake(el){ if(!el) return; el.style.transition='transform .12s'; el.style.transform='translateX(-6px)'; setTimeout(()=>{el.style.transform='translateX(6px)'; setTimeout(()=>{el.style.transform='';},120);},120); }
+
+function flashNotice(txt){ const prev=document.getElementById('_notice'); if(prev) prev.remove(); const n=document.createElement('div'); n.id='_notice'; n.textContent=txt; n.style.position='fixed'; n.style.right='18px'; n.style.top='18px'; n.style.padding='10px 14px'; n.style.borderRadius='10px'; n.style.background='linear-gradient(90deg, rgba(43,138,246,0.14), rgba(110,168,255,0.08))'; n.style.backdropFilter='blur(6px)'; n.style.boxShadow='0 10px 30px rgba(2,6,23,0.6)'; document.body.appendChild(n); setTimeout(()=>n.style.opacity='0',2200); setTimeout(()=>n.remove(),2600); }
+
+// ----- Dashboard build -----
+function buildDashboard(){ const wrap = document.getElementById('selectedHobbies'); wrap.innerHTML=''; state.selected.forEach(idx=>{
+  const data = HOBBIES[idx]; const card = document.createElement('div'); card.className='hobby-card card';
+  card.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between"><div><div style='font-weight:700'>${data.name} ${getEmojiForName(data.name)}</div><div class='muted' style='margin-top:6px'>${data.picks[0]}</div></div><div style='display:flex;flex-direction:column;gap:8px;align-items:flex-end'><div class='pill'>${state.completed.includes(idx)? '✅ Concluído':'⌛ Pendente'}</div><div style='display:flex;gap:8px'><button class='btn ghost view-hobby' data-idx='${idx}'>Abrir</button></div></div></div>`;
+  wrap.appendChild(card);
+}); document.querySelectorAll('.view-hobby').forEach(b=>b.addEventListener('click', e=>{ const idx=Number(e.currentTarget.dataset.idx); openHobby(idx); })); updateProgress(); }
+
+function getEmojiForName(name){ // small mapping for fun
+  if(/guitarra|violão|teclado|canto|música|DJ|Produção Musical/i.test(name)) return '🎵';
+  if(/pintura|desenho|aquarela|ilustração|escultura/i.test(name)) return '🎨';
+  if(/fotografia/i.test(name)) return '📷';
+  if(/culinária|barista|mixologia/i.test(name)) return '🍳';
+  if(/meditação|yoga/i.test(name)) return '🧘';
+  if(/programação|web|design|UI|UX|tech|robotica|eletrônica/i.test(name)) return '💻';
+  if(/jardinagem|horta|plantas/i.test(name)) return '🌱';
+  if(/corrida|ciclismo|hiking|calistenia/i.test(name)) return '🏃';
+  return '✨';
+}
+
+// ----- Hobby detail -----
+let currentHobbyIdx = null;
+function openHobby(idx){ currentHobbyIdx = idx; const data = HOBBIES[idx]; document.getElementById('hobbyTitle').textContent = data.name + ' ' + getEmojiForName(data.name);
+  document.getElementById('hobbySubtitle').textContent = state.completed.includes(idx)? 'Concluído ✅' : 'Pendente ⌛';
+  const ul = document.getElementById('suggestionsList'); ul.innerHTML=''; data.picks.forEach(s=>{ const li = document.createElement('li'); li.textContent = '🔹 ' + s; ul.appendChild(li); });
+  showView('hobby'); updateURLHash(); }
+
+// ----- Complete hobby action -----
+document.getElementById('completeHobby').addEventListener('click', ()=>{
+  if(currentHobbyIdx===null) return; if(!state.completed.includes(currentHobbyIdx)) state.completed.push(currentHobbyIdx);
+  saveState(); flashNotice('Hobby marcado como concluído ✅'); document.getElementById('hobbySubtitle').textContent = 'Concluído ✅'; updateUI(); checkEndConditions(); });
+
+// ----- Confirm selection -----
+document.getElementById('confirmSelection').addEventListener('click', ()=>{
+  if(state.selected.length!==5){ flashNotice('Escolha exatamente 5 hobbies antes de confirmar.'); return; }
+  // if not started, ensure startedAt exists (it is set when clicking Iniciar)
+  if(!state.startedAt) state.startedAt = new Date().toISOString();
+  saveState(); buildDashboard(); showView('dashboard'); updateURLHash(); updateUI(); });
+
+// ----- Start, navigation, reset -----
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  // set start immediately
+  if(!state.startedAt) state.startedAt = new Date().toISOString(); saveState(); buildGrid(); showView('selection'); updateURLHash(); updateUI(); });
+
+document.getElementById('seeHobbies').addEventListener('click', ()=>{ buildGrid(); showView('selection'); updateURLHash(); });
+
+document.getElementById('backToHome').addEventListener('click', ()=>{ showView('home'); updateURLHash(); });
+
+document.getElementById('backToDash').addEventListener('click', ()=>{ buildDashboard(); showView('dashboard'); updateURLHash(); });
+
+document.getElementById('goHome').addEventListener('click', ()=>{ showView('home'); updateURLHash(); });
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(!confirm('Deseja reiniciar o desafio e apagar progresso salvo?')) return; state = { selected: [], completed: [], startedAt: null }; saveState(); updateUI(); showView('home'); });
+
+// share and result nav
+document.getElementById('shareBtn').addEventListener('click', ()=>{ const msg = generateResultMessage(); navigator.clipboard && navigator.clipboard.writeText(msg); flashNotice('Resultado copiado para a área de transferência 🎉'); });
+
+document.getElementById('goHomeFromResult').addEventListener('click', ()=>{ showView('home'); });
+
+// ----- URL hash management -----
+function updateURLHash(){ const h = location.hash.replace('#',''); if(showing() === 'selection') location.hash = '#selection'; else if(showing() === 'dashboard') location.hash = '#dashboard'; else if(showing() === 'hobby' && currentHobbyIdx!==null) location.hash = '#hobby-'+currentHobbyIdx; else if(showing()==='result') location.hash='#result'; else location.hash=''; }
+
+function showing(){ for(const k in views) if(views[k].style.display!=='none') return k; return null; }
+
+window.addEventListener('hashchange', ()=>{
+  const h = location.hash.replace('#',''); if(h.startsWith('hobby-')){ const idx = Number(h.split('-')[1]); openHobby(idx); }
+  else if(h==='selection') showView('selection'); else if(h==='dashboard') showView('dashboard'); else if(h==='result') showView('result'); else showView('home'); });
+
+// ----- End conditions -----
+function checkEndConditions(){ // check if time up or all done
+  const daysLeft = getDaysLeft(); if(state.completed.length>=5){ showResult(true); }
+  else if(state.startedAt && daysLeft===0){ showResult(false); }
+}
+
+function showResult(won){ const el = document.getElementById('resultContent'); if(won){ el.innerHTML = `<h2>Parabéns! 🎉 Você completou o desafio!</h2><p class='muted'>Você concluiu ${state.completed.length}/5 hobbies dentro do prazo — incrível! 🚀</p>`; } else { el.innerHTML = `<h2>Desafio finalizado ⏳</h2><p class='muted'>Você completou ${state.completed.length}/5 hobbies. Continue a praticar — ainda há muito para explorar! 💪</p>`; }
+  showView('result'); updateURLHash(); }
+
+function generateResultMessage(){ if(state.completed.length>=5) return `Concluí o Desafio 30 Dias de Hobbies — completei ${state.completed.length}/5! 🎉`; else return `Participei do Desafio 30 Dias de Hobbies — completei ${state.completed.length}/5. Vou continuar! 🚀`; }
+
+// ----- UI refresh -----
+function updateUI(){ updateCountdown(); updateProgress(); // update selection checks
+  updateSelectionChecks(); // update dashboard if visible
+  if(showing()==='dashboard') buildDashboard(); // check end
+  if(state.startedAt){ // if time passed
+    const daysLeft = getDaysLeft(); if(daysLeft===0){ checkEndConditions(); }
+  }
+}
+
+// interval for countdown update
+setInterval(()=>{ updateCountdown(); }, 1000*30);
+
+// initial load
+loadState(); buildGrid(); updateUI();
+
+// if hash present on load
+if(location.hash.startsWith('#hobby-')){ const idx = Number(location.hash.split('-')[1]); if(!isNaN(idx)) openHobby(idx); }
+else if(location.hash==='#selection') showView('selection'); else if(location.hash==='#dashboard') showView('dashboard'); else if(location.hash==='#result') showView('result'); else showView('home');
+
+// quick check every minute for time-ended
+setInterval(()=>{ if(state.startedAt){ if(getDaysLeft()===0){ checkEndConditions(); } } }, 1000*60);
+
+</script>
+</body>
+</html>
